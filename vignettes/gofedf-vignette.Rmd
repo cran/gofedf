@@ -1,0 +1,265 @@
+---
+title: "Vignette for R package `gofedf`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{gofedf-vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo=FALSE}
+library(gofedf)
+```
+
+
+# Introduction
+
+The `gofedf` package provides computational tools to apply goodness-of-fit tests based on empirical distribution function theory. The package offers functions and routines to test the hypothesis that a univariate sample follows a distribution based on the empirical distribution function. The theory is founded on reducing the problem to a stochastic process and computing its covariance function. An approximate p-value is computed using the `Imhof` or `Farebrother` method based on the limiting distribution of the statistic (see note section for more details about choice of method). Users can run the test by calculating either the Cramer-von Mises or Anderson-Darling statistic. The covariance function of the stochastic process relies on specific characteristics of the assumed model. Notably, knowledge of the Fisher information matrix and the partial derivatives of the cumulative distribution function is crucial for computing the covariance function. However, obtaining these quantities can be computationally intensive or challenging in general likelihood models. To overcome this limitation, we propose an alternative method for estimating the covariance function of the stochastic process directly from the sample data. The package provides tools for this estimation and for testing if a sample comes from any general likelihood model. In summary, the package can be used to apply a goodness-of-fit test in any of the following settings:
+
+- Validate if the assumptions about the response variable in a generalized linear model (with any link function) are satisfied. The current version only checks for the Gamma distribution.
+
+- Validate if the normality assumptions in a linear model are satisfied.
+
+- Apply a goodness-of-fit test to examine if a set of bivariate samples follows a Normal, Gamma, or Exponential distribution.
+
+- Formal model evaluation in a general likelihood model. In this case, probability inverse transformed (PIT) values of the sample and the score function (if any parameter estimation is involved) are required. See the example for more details.
+
+
+Authors:
+
+*   [Richard Lockhart](http://www.sfu.ca/~lockhart/), <lockhart@sfu.ca>
+*   [Payman Nickchi](https://github.com/pnickchi), <pnickchi@sfu.ca> (Maintainer)
+
+
+## Installation
+
+You can install the released version of `gofedf` from [CRAN](https://CRAN.R-project.org) with:
+
+```{r, eval=FALSE}
+install.packages('gofedf')
+```
+
+
+or the development version from [GitHub](https://github.com/pnickchi) page with:
+
+```{r, eval=FALSE}
+# install.packages("devtools")
+devtools::install_github('pnickchi/gofedf')
+```
+
+
+## Examples
+
+In this section, we will review the package's primary functions and provide illustrative examples to demonstrate their usage. The first two examples relate to applying the goodness-of-fit (GOF) test for i.i.d. samples, while the last two focus on linear models and generalized linear models. The final example showcases the most important feature of the package, allowing you to apply goodness-of-fit tests based on empirical distribution function EDF for a general likelihood model.
+
+
+### 1. Bivariate Normal distribution
+
+The first example illustrates the GOF test for an i.i.d. sample from a Normal distribution. The main function is `testNormal`. At the minimum, it requires a numeric vector as input. By default, it uses probability inverse-transformed values to compute the stochastic process and its covariance function later. You can change this behavior by setting `gridpit = FALSE` and assigning a positive value for `ngrid`. The default value for `ngrid` is the same as the number of observations, `n`. This means the (0,1) interval is divided into `n` equally spaced data points to compute the stochastic process and the covariance function. Additionally, the Fisher information matrix, by default, is estimated by the variance of the score function. To change this, you can set `hessian=TRUE` to estimate the Fisher information matrix using the Hessian instead. Finally, method is a string that defines the statistic to compute. Possible values are `cvm` for Cramer-von-Mises, `ad` for Anderson-Darling, and both to compute both.
+
+```{r}
+library(gofedf)
+
+# Reproducible example
+set.seed(123)
+
+# Randomly generate some data from Normal distribution
+n <- 50
+x <- rnorm(n)
+
+# Test if the data follows a Normal distribution by calculating the Cramer-von Mises statistic and approximate p-value of the test.
+testNormal(x = x, method = 'cvm')
+```
+
+
+```{r}
+# Test if the data follows a Normal distribution by calculating the Anderson-Darling statistic and approximate p-value of the test.
+testNormal(x = x, method = 'ad')
+```
+
+
+```{r}
+# Generate some random sample from a non Normal distribution.
+x <- rgamma(n, shape = 3)
+testNormal(x = x, method = 'cvm')
+```
+
+
+### 2. Bivariate Gamma distribution
+
+The second example illustrates the GOF test for an i.i.d. sample from a Gamma distribution. The main function is `testGamma` and the arguments remain the same as Normal case. 
+
+```{r}
+# Reproducible example
+set.seed(123)
+
+# Randomly generate some data
+n <- 50
+x <- rgamma(n, shape = 3)
+
+# Test if the data follows a Gamma distribution, calculate Cramer-von Mises statistic and approximate p-value
+testGamma(x = x, method = 'cvm')
+```
+
+```{r}
+# Generate some random sample from a distribution that is not Gamma
+x <- runif(n)
+testNormal(x = x, method = 'cvm')
+```
+
+
+### 3. Linear model with Normal error terms
+
+In this example, we illustrate how to apply GOF test to verify the assumptions of a linear model. The main function is `testLMNormal`. At the minimum, a numeric vector of response variable, `y`, and a vector/ matrix of explanatory variables, `x`, are required. Conveniently, the function can take an object of class "lm" and directly applies the goodness-of-fit test. In this case, there is no need to pass `x` and `y`. Note that if you decide to use this feature, you need to explicitly  ask `lm` function to return the design matrix and response variable by passing `x=TRUE` and `y=TRUE` (as shown in the example below). The other arguments of the function are the same as previous examples. 
+
+```{r}
+# Reproducible example
+set.seed(123)
+
+# Create a set of explanatory variables and a response variable according to a linear model
+
+# Sample size
+n <- 50
+
+# Number of explanatory variables
+p <- 5
+
+# Generate some coefficients
+b <- runif(p)
+
+# Simulate random explanatory variables
+X <- matrix( runif(n*p), nrow = n, ncol = p)
+
+# Generate some error terms from Normal distribution
+e <- rnorm(n)
+
+# Generate response variable according to the linear model
+y <- X %*% b + e
+
+# Test if the residuals of the model follows a Normal distribution, calculate Cramer-von Mises statistic and approximate p-value
+testLMNormal(x = X, y)
+```
+
+
+```{r}
+# Or alternatively just pass 'lm.fit' object directly instead:
+lm.fit <- lm(y ~ X, x = TRUE, y = TRUE)
+testLMNormal(fit = lm.fit)
+```
+
+
+
+### 4. Gamma GLM with any link function
+
+In this example, we illustrate how to apply the GOF test to verify if the response variable in a generalized linear model with any link function follows a Gamma distribution. The main function for this is `testGLMGamma`. At the minimum, you need a numeric vector of the response variable, `y`, a vector/matrix of explanatory variables, `x`, and a link function for the Gamma family. Conveniently, the function can take an object of class `glm` and directly apply the goodness-of-fit test. You can use `glm` or `glm2` function from `glm2` pacakge. We recommend using the `glm2` function from the `glm2` package as it provides better estimates for the coefficients and avoids convergence issues in the optimization process. In either of these cases, there is no need to pass `x` and `y`. However, if you decide to use this feature, you must explicitly ask the `glm` or `glm2` function to return the design matrix and response variable by passing `x=TRUE` and `y=TRUE` (as shown in the example below). Additionally, you can pass a starting value, `start.value`, to be used as the initial value for MLE estimation of the coefficients. The function also offers a list of parameters to control the fitting process in `glm` or `glm2` functions. The other arguments of the function remain consistent with previous examples.
+
+
+```{r}
+# Reproducible example
+set.seed(123)
+
+# Create a set of explanatory variables and a response variable according to a generalized linear model.
+
+# Sample size
+n <- 50
+
+# Number of explanatory variables
+p <- 5
+
+# Simulate random explanatory variables
+X <- matrix( rnorm(n*p, mean = 10, sd = 0.1), nrow = n, ncol = p)
+
+# Generate some coefficients
+b <- runif(p)
+
+# Generate some error terms from Gamma distribution
+e <- rgamma(n, shape = 3)
+
+# Generate response variable according to the generalized linear model (log link function)
+y <- exp(X %*% b) * e
+
+# Test if the Gamma assumptions of the response variable holds by calculating the Cramer-von Mises statistic and approximate p-value
+testGLMGamma(x=X, y, l = 'log', method = 'cvm')
+```
+
+
+```{r}
+# Or alternatively just pass 'glm.fit' object directly instead:
+glm.fit <- glm2::glm2(y ~ X, family = Gamma(link = 'log'), x = TRUE, y = TRUE)
+testGLMGamma(fit = glm.fit, l = 'log')
+```
+
+
+### 5. General likelihood model
+
+One of the most important features of the package is to provide computational tools to apply the goodness-of-fit test based on empirical distribution functions for any general likelihood model. We provided tools to apply the test for Normal, Gamma, verify the assumptions in a linear model and generalized linear model. But this additional feature allows you to test if the sample come from any general likelihood model. For example, consider you have a sample of size $n$, such as $X_1, X_2, \ldots, X_n$, from a model with CDF of $F(X;\theta)$ where $\theta$ contains $p$ parameters. Before running the test, at the minimum you need the followings: 
+
+(i) A numeric vector of observations, `x`.
+
+(ii) The probability inverse transformed or PIT values of the sample which ought to be a numeric vector with the same size as `x` and with elements $F^{-1}(X_{i};\theta)$.
+
+If $\theta$ is unknown, you also need to provide score function. This needs to be a matrix with $n$ rows and $p$ columns where each row measures the score of each observation. Note that the values are computed as $S(X_{i};\theta) = \frac{\partial}{\partial \theta} \log(f(X_{i};\theta))$ where $f(X_{i};\theta)$ is the probability density function. For sure, if $\theta$ is not known, this means you need to compute the MLE of $\theta$ to obtain item 1 and if needed the score function. The main function to apply the GOF test in this case is `testYourModel`. The `precision` argument sets the precision needed to check if the col sums of score matrix are close enough to zero (log-likelihood is zero at MLE). The other arguments of the function remain consistent with previous examples.
+
+In the following example, we demonstrate how to apply the goodness-of-fit test to check if a sample follows an Inverse Gaussian distribution, where the shape parameter depends on some weights. First, we generate data from an Inverse Gaussian distribution. For illustrative purposes, we include functions to compute the Maximum Likelihood Estimation (MLE) and score function for the sample. In the following chunck of code, `inversegaussianScore` is a function that returns the score for each observation, and `inversegaussianPIT` is a function that provides a vector of Probability Inverse Transformed (PIT) values. Additionally, `inversegaussianMLE` calculates the MLE of the mean and shape parameter. Second we calculate score, PIT and MLE of parameters. Finally we call `testYourModel` function to apply the test.
+
+```{r}
+# Example: Inverse Gaussian (IG) distribution with weights
+
+# Reproducible example
+set.seed(123)
+
+# Set the sample size
+n <- 50
+
+# Assign weights
+weights <- runif(n, min = 5, max = 6)
+weights <- weights / sum(weights)
+
+# Set mean and shape parameters for IG distribution.
+mio        <- 2
+lambda     <- 2
+
+# Generate a random sample from IG distribution with weighted shape.
+y <- statmod::rinvgauss(n, mean = mio, shape = lambda * weights)
+
+# Compute MLE of parameters, score matrix, and pit values.
+theta_hat    <- inversegaussianMLE(obs = y,   w = weights)
+score.matrix <- inversegaussianScore(obs = y, w = weights, mle = theta_hat)
+pit.values   <- inversegaussianPIT(obs = y ,  w = weights, mle = theta_hat)
+
+# Apply the goodness-of-fit test.
+testYourModel(x = y, pit = pit.values, score = score.matrix)
+```
+
+
+### Note
+
+The calculation of the p-value for the goodness-of-fit test based on the empirical distribution function relies on computing the tail probability of a sum of chi-squared random variables. Specifically, after finding the eigenvalues $\lambda_{1}, \lambda_{2}, \ldots, \lambda_{n}$, we need to compute the p-value as follows: $p-value = Pr\left(\sum_{i=1}^{n} \lambda_{i}Z_{i}^{2} \geq x\right)$, where $Z_{i}^{2}$ is a random variable following $\chi^{2}_{(1)}$ distribution and $x$ represents the statistic (cvm or ad). The `CompQuadForm` package is being used for this purpose as it contains different methods for computing this tail probability. We were particularly interested in the `Farebrother` and `Imhof` methods. However, both the `Imhof` and `Farebrother` functions from the package encounter difficulties when computing the p-value if the statistic is in the very tail of the distribution or if some of the $\lambda_{i}$ values are very small. They may produce negative p-values or p-values that are not accurate.
+
+Through numerical experimentation in the GLM-Gamma case and comparison between p-values generated by `Imhof` and `Farebrother`, we discovered a way to solve this problem. After computing the eigenvalues, we remove values that are extremely small (e.g., $1 \times 10^{-15}$). Then, we divide the remaining eigenvalues into two sets: one set contains values greater than $\frac{\lambda_{1}}{2000}$, and the other set contains values less than $\frac{\lambda_{1}}{2000}$. We then compute the sum of the eigenvalues in the second set and use this sum to compensate for the deleted eigenvalues, thereby correcting the cvm or ad statistic. The values of set one is used for p-value computation.
+
+During the computation of the p-value, we theoretically obtain both a lower bound (LB) and an upper bound (UB) for the p-value. If the LB is greater than 1e-7, we compute the p-value using the `Imhof` method and ensure that the computed p-value falls within the range between LB and UB. If it doesn't, we calculate the p-value using the `Farebrother` method. If the LB falls between 1e-10 and 1e-7, we compute the p-value using the `Farebrother` method. Finally, if the LB is less than 1e-10, we first attempt to calculate the p-value using the `Farebrother` method. If this attempt fails, we return both the LB and UB along with a warning that `CompQuadForm` failed to generate a valid p-value.
+
+
+
+
+### References
+
+[1] Imhof, J.P. (1961). [Computing the Distribution of Quadratic Forms in Normal Variables] *Biometrika*, Vol. 48, 419-426.
+
+[2] Farebrother R.W. (1984). [Algorithm AS 204: The distribution of a Positive Linear Combination of chi-squared random variables] *Journal of the Royal Statistical Society*, Vol. 33, No. 3, 332-339.
+
+[3] Giner G. and Smyth G. K. (2016). [statmod: Probability calculations for the inverse Gaussian distribution] *R Journal*, Vol. 8, No 3, 339-351.
+
+[4] Stephens, M.A. (1974). [EDF Statistics for Goodness of Fit and Some Comparisons.] *Journal of the American Statistical Association*, Vol. 69, 730-737.
+
+[5] Stephens, M.A. (1976). [Asymptotic results for goodness-of-fit statistics with unknown parameters.] *Annals of Statistics*, Vol. 4, 357-369.
+
+[6] Duchesne, P. and Lafaye De Micheaux, P. (2010). [Computing the distribution of quadratic forms: Further comparisons between the Liu-Tang-Zhang approximation and exact methods] *Computational Statistics and Data Analysis*, Vol. 54, 858-862.

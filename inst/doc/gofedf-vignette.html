@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Vignette for R package gofedf</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Vignette for R package
+<code>gofedf</code></h1>
+
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>The <code>gofedf</code> package provides computational tools to apply
+goodness-of-fit tests based on empirical distribution function theory.
+The package offers functions and routines to test the hypothesis that a
+univariate sample follows a distribution based on the empirical
+distribution function. The theory is founded on reducing the problem to
+a stochastic process and computing its covariance function. An
+approximate p-value is computed using the <code>Imhof</code> or
+<code>Farebrother</code> method based on the limiting distribution of
+the statistic (see note section for more details about choice of
+method). Users can run the test by calculating either the Cramer-von
+Mises or Anderson-Darling statistic. The covariance function of the
+stochastic process relies on specific characteristics of the assumed
+model. Notably, knowledge of the Fisher information matrix and the
+partial derivatives of the cumulative distribution function is crucial
+for computing the covariance function. However, obtaining these
+quantities can be computationally intensive or challenging in general
+likelihood models. To overcome this limitation, we propose an
+alternative method for estimating the covariance function of the
+stochastic process directly from the sample data. The package provides
+tools for this estimation and for testing if a sample comes from any
+general likelihood model. In summary, the package can be used to apply a
+goodness-of-fit test in any of the following settings:</p>
+<ul>
+<li><p>Validate if the assumptions about the response variable in a
+generalized linear model (with any link function) are satisfied. The
+current version only checks for the Gamma distribution.</p></li>
+<li><p>Validate if the normality assumptions in a linear model are
+satisfied.</p></li>
+<li><p>Apply a goodness-of-fit test to examine if a set of bivariate
+samples follows a Normal, Gamma, or Exponential distribution.</p></li>
+<li><p>Formal model evaluation in a general likelihood model. In this
+case, probability inverse transformed (PIT) values of the sample and the
+score function (if any parameter estimation is involved) are required.
+See the example for more details.</p></li>
+</ul>
+<p>Authors:</p>
+<ul>
+<li><a href="http://www.sfu.ca/~lockhart/">Richard Lockhart</a>, <a href="mailto:lockhart@sfu.ca" class="email">lockhart@sfu.ca</a></li>
+<li><a href="https://github.com/pnickchi">Payman Nickchi</a>, <a href="mailto:pnickchi@sfu.ca" class="email">pnickchi@sfu.ca</a>
+(Maintainer)</li>
+</ul>
+<div id="installation" class="section level2">
+<h2>Installation</h2>
+<p>You can install the released version of <code>gofedf</code> from <a href="https://CRAN.R-project.org">CRAN</a> with:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&#39;gofedf&#39;</span>)</span></code></pre></div>
+<p>or the development version from <a href="https://github.com/pnickchi">GitHub</a> page with:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># install.packages(&quot;devtools&quot;)</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&#39;pnickchi/gofedf&#39;</span>)</span></code></pre></div>
+</div>
+<div id="examples" class="section level2">
+<h2>Examples</h2>
+<p>In this section, we will review the package’s primary functions and
+provide illustrative examples to demonstrate their usage. The first two
+examples relate to applying the goodness-of-fit (GOF) test for i.i.d.
+samples, while the last two focus on linear models and generalized
+linear models. The final example showcases the most important feature of
+the package, allowing you to apply goodness-of-fit tests based on
+empirical distribution function EDF for a general likelihood model.</p>
+<div id="bivariate-normal-distribution" class="section level3">
+<h3>1. Bivariate Normal distribution</h3>
+<p>The first example illustrates the GOF test for an i.i.d. sample from
+a Normal distribution. The main function is <code>testNormal</code>. At
+the minimum, it requires a numeric vector as input. By default, it uses
+probability inverse-transformed values to compute the stochastic process
+and its covariance function later. You can change this behavior by
+setting <code>gridpit = FALSE</code> and assigning a positive value for
+<code>ngrid</code>. The default value for <code>ngrid</code> is the same
+as the number of observations, <code>n</code>. This means the (0,1)
+interval is divided into <code>n</code> equally spaced data points to
+compute the stochastic process and the covariance function.
+Additionally, the Fisher information matrix, by default, is estimated by
+the variance of the score function. To change this, you can set
+<code>hessian=TRUE</code> to estimate the Fisher information matrix
+using the Hessian instead. Finally, method is a string that defines the
+statistic to compute. Possible values are <code>cvm</code> for
+Cramer-von-Mises, <code>ad</code> for Anderson-Darling, and both to
+compute both.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">library</span>(gofedf)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co"># Reproducible example</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co"># Randomly generate some data from Normal distribution</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">50</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co"># Test if the data follows a Normal distribution by calculating the Cramer-von Mises statistic and approximate p-value of the test.</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="fu">testNormal</span>(<span class="at">x =</span> x, <span class="at">method =</span> <span class="st">&#39;cvm&#39;</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co">#&gt; $Statistic</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="co">#&gt; [1] 0.03781322</span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="co">#&gt; $pvalue</span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="co">#&gt; [1] 0.6766974</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># Test if the data follows a Normal distribution by calculating the Anderson-Darling statistic and approximate p-value of the test.</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="fu">testNormal</span>(<span class="at">x =</span> x, <span class="at">method =</span> <span class="st">&#39;ad&#39;</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co">#&gt; $Statistic</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co">#&gt; [1] 0.2179704</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt; $pvalue</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt; [1] 0.9426823</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Generate some random sample from a non Normal distribution.</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">rgamma</span>(n, <span class="at">shape =</span> <span class="dv">3</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="fu">testNormal</span>(<span class="at">x =</span> x, <span class="at">method =</span> <span class="st">&#39;cvm&#39;</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co">#&gt; $Statistic</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co">#&gt; [1] 0.2141872</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt; $pvalue</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt; [1] 0.004302717</span></span></code></pre></div>
+</div>
+<div id="bivariate-gamma-distribution" class="section level3">
+<h3>2. Bivariate Gamma distribution</h3>
+<p>The second example illustrates the GOF test for an i.i.d. sample from
+a Gamma distribution. The main function is <code>testGamma</code> and
+the arguments remain the same as Normal case.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># Reproducible example</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co"># Randomly generate some data</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">50</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">rgamma</span>(n, <span class="at">shape =</span> <span class="dv">3</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="co"># Test if the data follows a Gamma distribution, calculate Cramer-von Mises statistic and approximate p-value</span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="fu">testGamma</span>(<span class="at">x =</span> x, <span class="at">method =</span> <span class="st">&#39;cvm&#39;</span>)</span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="co">#&gt; $Statistic</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="co">#&gt; [1] 0.0549759</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="co">#&gt; $pvalue</span></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="co">#&gt; [1] 0.3553938</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># Generate some random sample from a distribution that is not Gamma</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">runif</span>(n)</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="fu">testNormal</span>(<span class="at">x =</span> x, <span class="at">method =</span> <span class="st">&#39;cvm&#39;</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="co">#&gt; $Statistic</span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="co">#&gt; [1] 0.07085577</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co">#&gt; $pvalue</span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co">#&gt; [1] 0.1730288</span></span></code></pre></div>
+</div>
+<div id="linear-model-with-normal-error-terms" class="section level3">
+<h3>3. Linear model with Normal error terms</h3>
+<p>In this example, we illustrate how to apply GOF test to verify the
+assumptions of a linear model. The main function is
+<code>testLMNormal</code>. At the minimum, a numeric vector of response
+variable, <code>y</code>, and a vector/ matrix of explanatory variables,
+<code>x</code>, are required. Conveniently, the function can take an
+object of class “lm” and directly applies the goodness-of-fit test. In
+this case, there is no need to pass <code>x</code> and <code>y</code>.
+Note that if you decide to use this feature, you need to explicitly ask
+<code>lm</code> function to return the design matrix and response
+variable by passing <code>x=TRUE</code> and <code>y=TRUE</code> (as
+shown in the example below). The other arguments of the function are the
+same as previous examples.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># Reproducible example</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="co"># Create a set of explanatory variables and a response variable according to a linear model</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co"># Sample size</span></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">50</span></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="co"># Number of explanatory variables</span></span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="dv">5</span></span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a></span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a><span class="co"># Generate some coefficients</span></span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="fu">runif</span>(p)</span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a></span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a><span class="co"># Simulate random explanatory variables</span></span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">matrix</span>( <span class="fu">runif</span>(n<span class="sc">*</span>p), <span class="at">nrow =</span> n, <span class="at">ncol =</span> p)</span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a></span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a><span class="co"># Generate some error terms from Normal distribution</span></span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a>e <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb8-20"><a href="#cb8-20" tabindex="-1"></a></span>
+<span id="cb8-21"><a href="#cb8-21" tabindex="-1"></a><span class="co"># Generate response variable according to the linear model</span></span>
+<span id="cb8-22"><a href="#cb8-22" tabindex="-1"></a>y <span class="ot">&lt;-</span> X <span class="sc">%*%</span> b <span class="sc">+</span> e</span>
+<span id="cb8-23"><a href="#cb8-23" tabindex="-1"></a></span>
+<span id="cb8-24"><a href="#cb8-24" tabindex="-1"></a><span class="co"># Test if the residuals of the model follows a Normal distribution, calculate Cramer-von Mises statistic and approximate p-value</span></span>
+<span id="cb8-25"><a href="#cb8-25" tabindex="-1"></a><span class="fu">testLMNormal</span>(<span class="at">x =</span> X, y)</span>
+<span id="cb8-26"><a href="#cb8-26" tabindex="-1"></a><span class="co">#&gt; $Statistic</span></span>
+<span id="cb8-27"><a href="#cb8-27" tabindex="-1"></a><span class="co">#&gt; [1] 0.02285164</span></span>
+<span id="cb8-28"><a href="#cb8-28" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-29"><a href="#cb8-29" tabindex="-1"></a><span class="co">#&gt; $pvalue</span></span>
+<span id="cb8-30"><a href="#cb8-30" tabindex="-1"></a><span class="co">#&gt; [1] 0.9089065</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="co"># Or alternatively just pass &#39;lm.fit&#39; object directly instead:</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>lm.fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> X, <span class="at">x =</span> <span class="cn">TRUE</span>, <span class="at">y =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="fu">testLMNormal</span>(<span class="at">fit =</span> lm.fit)</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="co">#&gt; $Statistic</span></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="co">#&gt; [1] 0.02285164</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a><span class="co">#&gt; $pvalue</span></span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a><span class="co">#&gt; [1] 0.9089065</span></span></code></pre></div>
+</div>
+<div id="gamma-glm-with-any-link-function" class="section level3">
+<h3>4. Gamma GLM with any link function</h3>
+<p>In this example, we illustrate how to apply the GOF test to verify if
+the response variable in a generalized linear model with any link
+function follows a Gamma distribution. The main function for this is
+<code>testGLMGamma</code>. At the minimum, you need a numeric vector of
+the response variable, <code>y</code>, a vector/matrix of explanatory
+variables, <code>x</code>, and a link function for the Gamma family.
+Conveniently, the function can take an object of class <code>glm</code>
+and directly apply the goodness-of-fit test. You can use
+<code>glm</code> or <code>glm2</code> function from <code>glm2</code>
+pacakge. We recommend using the <code>glm2</code> function from the
+<code>glm2</code> package as it provides better estimates for the
+coefficients and avoids convergence issues in the optimization process.
+In either of these cases, there is no need to pass <code>x</code> and
+<code>y</code>. However, if you decide to use this feature, you must
+explicitly ask the <code>glm</code> or <code>glm2</code> function to
+return the design matrix and response variable by passing
+<code>x=TRUE</code> and <code>y=TRUE</code> (as shown in the example
+below). Additionally, you can pass a starting value,
+<code>start.value</code>, to be used as the initial value for MLE
+estimation of the coefficients. The function also offers a list of
+parameters to control the fitting process in <code>glm</code> or
+<code>glm2</code> functions. The other arguments of the function remain
+consistent with previous examples.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="co"># Reproducible example</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="co"># Create a set of explanatory variables and a response variable according to a generalized linear model.</span></span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="co"># Sample size</span></span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">50</span></span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a><span class="co"># Number of explanatory variables</span></span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="dv">5</span></span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a><span class="co"># Simulate random explanatory variables</span></span>
+<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">matrix</span>( <span class="fu">rnorm</span>(n<span class="sc">*</span>p, <span class="at">mean =</span> <span class="dv">10</span>, <span class="at">sd =</span> <span class="fl">0.1</span>), <span class="at">nrow =</span> n, <span class="at">ncol =</span> p)</span>
+<span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a></span>
+<span id="cb10-15"><a href="#cb10-15" tabindex="-1"></a><span class="co"># Generate some coefficients</span></span>
+<span id="cb10-16"><a href="#cb10-16" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="fu">runif</span>(p)</span>
+<span id="cb10-17"><a href="#cb10-17" tabindex="-1"></a></span>
+<span id="cb10-18"><a href="#cb10-18" tabindex="-1"></a><span class="co"># Generate some error terms from Gamma distribution</span></span>
+<span id="cb10-19"><a href="#cb10-19" tabindex="-1"></a>e <span class="ot">&lt;-</span> <span class="fu">rgamma</span>(n, <span class="at">shape =</span> <span class="dv">3</span>)</span>
+<span id="cb10-20"><a href="#cb10-20" tabindex="-1"></a></span>
+<span id="cb10-21"><a href="#cb10-21" tabindex="-1"></a><span class="co"># Generate response variable according to the generalized linear model (log link function)</span></span>
+<span id="cb10-22"><a href="#cb10-22" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">exp</span>(X <span class="sc">%*%</span> b) <span class="sc">*</span> e</span>
+<span id="cb10-23"><a href="#cb10-23" tabindex="-1"></a></span>
+<span id="cb10-24"><a href="#cb10-24" tabindex="-1"></a><span class="co"># Test if the Gamma assumptions of the response variable holds by calculating the Cramer-von Mises statistic and approximate p-value</span></span>
+<span id="cb10-25"><a href="#cb10-25" tabindex="-1"></a><span class="fu">testGLMGamma</span>(<span class="at">x=</span>X, y, <span class="at">l =</span> <span class="st">&#39;log&#39;</span>, <span class="at">method =</span> <span class="st">&#39;cvm&#39;</span>)</span>
+<span id="cb10-26"><a href="#cb10-26" tabindex="-1"></a><span class="co">#&gt; $Statistic</span></span>
+<span id="cb10-27"><a href="#cb10-27" tabindex="-1"></a><span class="co">#&gt; [1] 0.0870493</span></span>
+<span id="cb10-28"><a href="#cb10-28" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb10-29"><a href="#cb10-29" tabindex="-1"></a><span class="co">#&gt; $pvalue</span></span>
+<span id="cb10-30"><a href="#cb10-30" tabindex="-1"></a><span class="co">#&gt; [1] 0.1896532</span></span>
+<span id="cb10-31"><a href="#cb10-31" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb10-32"><a href="#cb10-32" tabindex="-1"></a><span class="co">#&gt; $converged</span></span>
+<span id="cb10-33"><a href="#cb10-33" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="co"># Or alternatively just pass &#39;glm.fit&#39; object directly instead:</span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>glm.fit <span class="ot">&lt;-</span> glm2<span class="sc">::</span><span class="fu">glm2</span>(y <span class="sc">~</span> X, <span class="at">family =</span> <span class="fu">Gamma</span>(<span class="at">link =</span> <span class="st">&#39;log&#39;</span>), <span class="at">x =</span> <span class="cn">TRUE</span>, <span class="at">y =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a><span class="fu">testGLMGamma</span>(<span class="at">fit =</span> glm.fit, <span class="at">l =</span> <span class="st">&#39;log&#39;</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a><span class="co">#&gt; $Statistic</span></span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a><span class="co">#&gt; [1] 0.0870493</span></span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a><span class="co">#&gt; $pvalue</span></span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a><span class="co">#&gt; [1] 0.1896532</span></span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a><span class="co">#&gt; $converged</span></span>
+<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+</div>
+<div id="general-likelihood-model" class="section level3">
+<h3>5. General likelihood model</h3>
+<p>One of the most important features of the package is to provide
+computational tools to apply the goodness-of-fit test based on empirical
+distribution functions for any general likelihood model. We provided
+tools to apply the test for Normal, Gamma, verify the assumptions in a
+linear model and generalized linear model. But this additional feature
+allows you to test if the sample come from any general likelihood model.
+For example, consider you have a sample of size <span class="math inline">\(n\)</span>, such as <span class="math inline">\(X_1, X_2, \ldots, X_n\)</span>, from a model with
+CDF of <span class="math inline">\(F(X;\theta)\)</span> where <span class="math inline">\(\theta\)</span> contains <span class="math inline">\(p\)</span> parameters. Before running the test, at
+the minimum you need the followings:</p>
+<ol style="list-style-type: lower-roman">
+<li><p>A numeric vector of observations, <code>x</code>.</p></li>
+<li><p>The probability inverse transformed or PIT values of the sample
+which ought to be a numeric vector with the same size as <code>x</code>
+and with elements <span class="math inline">\(F^{-1}(X_{i};\theta)\)</span>.</p></li>
+</ol>
+<p>If <span class="math inline">\(\theta\)</span> is unknown, you also
+need to provide score function. This needs to be a matrix with <span class="math inline">\(n\)</span> rows and <span class="math inline">\(p\)</span> columns where each row measures the
+score of each observation. Note that the values are computed as <span class="math inline">\(S(X_{i};\theta) = \frac{\partial}{\partial \theta}
+\log(f(X_{i};\theta))\)</span> where <span class="math inline">\(f(X_{i};\theta)\)</span> is the probability
+density function. For sure, if <span class="math inline">\(\theta\)</span> is not known, this means you need
+to compute the MLE of <span class="math inline">\(\theta\)</span> to
+obtain item 1 and if needed the score function. The main function to
+apply the GOF test in this case is <code>testYourModel</code>. The
+<code>precision</code> argument sets the precision needed to check if
+the col sums of score matrix are close enough to zero (log-likelihood is
+zero at MLE). The other arguments of the function remain consistent with
+previous examples.</p>
+<p>In the following example, we demonstrate how to apply the
+goodness-of-fit test to check if a sample follows an Inverse Gaussian
+distribution, where the shape parameter depends on some weights. First,
+we generate data from an Inverse Gaussian distribution. For illustrative
+purposes, we include functions to compute the Maximum Likelihood
+Estimation (MLE) and score function for the sample. In the following
+chunck of code, <code>inversegaussianScore</code> is a function that
+returns the score for each observation, and
+<code>inversegaussianPIT</code> is a function that provides a vector of
+Probability Inverse Transformed (PIT) values. Additionally,
+<code>inversegaussianMLE</code> calculates the MLE of the mean and shape
+parameter. Second we calculate score, PIT and MLE of parameters. Finally
+we call <code>testYourModel</code> function to apply the test.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="co"># Example: Inverse Gaussian (IG) distribution with weights</span></span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a><span class="co"># Reproducible example</span></span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="co"># Set the sample size</span></span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">50</span></span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a></span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a><span class="co"># Assign weights</span></span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a>weights <span class="ot">&lt;-</span> <span class="fu">runif</span>(n, <span class="at">min =</span> <span class="dv">5</span>, <span class="at">max =</span> <span class="dv">6</span>)</span>
+<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a>weights <span class="ot">&lt;-</span> weights <span class="sc">/</span> <span class="fu">sum</span>(weights)</span>
+<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a></span>
+<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a><span class="co"># Set mean and shape parameters for IG distribution.</span></span>
+<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a>mio        <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a>lambda     <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb12-16"><a href="#cb12-16" tabindex="-1"></a></span>
+<span id="cb12-17"><a href="#cb12-17" tabindex="-1"></a><span class="co"># Generate a random sample from IG distribution with weighted shape.</span></span>
+<span id="cb12-18"><a href="#cb12-18" tabindex="-1"></a>y <span class="ot">&lt;-</span> statmod<span class="sc">::</span><span class="fu">rinvgauss</span>(n, <span class="at">mean =</span> mio, <span class="at">shape =</span> lambda <span class="sc">*</span> weights)</span>
+<span id="cb12-19"><a href="#cb12-19" tabindex="-1"></a></span>
+<span id="cb12-20"><a href="#cb12-20" tabindex="-1"></a><span class="co"># Compute MLE of parameters, score matrix, and pit values.</span></span>
+<span id="cb12-21"><a href="#cb12-21" tabindex="-1"></a>theta_hat    <span class="ot">&lt;-</span> <span class="fu">inversegaussianMLE</span>(<span class="at">obs =</span> y,   <span class="at">w =</span> weights)</span>
+<span id="cb12-22"><a href="#cb12-22" tabindex="-1"></a>score.matrix <span class="ot">&lt;-</span> <span class="fu">inversegaussianScore</span>(<span class="at">obs =</span> y, <span class="at">w =</span> weights, <span class="at">mle =</span> theta_hat)</span>
+<span id="cb12-23"><a href="#cb12-23" tabindex="-1"></a>pit.values   <span class="ot">&lt;-</span> <span class="fu">inversegaussianPIT</span>(<span class="at">obs =</span> y ,  <span class="at">w =</span> weights, <span class="at">mle =</span> theta_hat)</span>
+<span id="cb12-24"><a href="#cb12-24" tabindex="-1"></a></span>
+<span id="cb12-25"><a href="#cb12-25" tabindex="-1"></a><span class="co"># Apply the goodness-of-fit test.</span></span>
+<span id="cb12-26"><a href="#cb12-26" tabindex="-1"></a><span class="fu">testYourModel</span>(<span class="at">x =</span> y, <span class="at">pit =</span> pit.values, <span class="at">score =</span> score.matrix)</span>
+<span id="cb12-27"><a href="#cb12-27" tabindex="-1"></a><span class="co">#&gt; $Statistic</span></span>
+<span id="cb12-28"><a href="#cb12-28" tabindex="-1"></a><span class="co">#&gt; Cramer-von-Mises Statistic </span></span>
+<span id="cb12-29"><a href="#cb12-29" tabindex="-1"></a><span class="co">#&gt;                 0.03292151 </span></span>
+<span id="cb12-30"><a href="#cb12-30" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb12-31"><a href="#cb12-31" tabindex="-1"></a><span class="co">#&gt; $pvalue</span></span>
+<span id="cb12-32"><a href="#cb12-32" tabindex="-1"></a><span class="co">#&gt; [1] 0.8436222</span></span></code></pre></div>
+</div>
+<div id="note" class="section level3">
+<h3>Note</h3>
+<p>The calculation of the p-value for the goodness-of-fit test based on
+the empirical distribution function relies on computing the tail
+probability of a sum of chi-squared random variables. Specifically,
+after finding the eigenvalues <span class="math inline">\(\lambda_{1},
+\lambda_{2}, \ldots, \lambda_{n}\)</span>, we need to compute the
+p-value as follows: <span class="math inline">\(p-value =
+Pr\left(\sum_{i=1}^{n} \lambda_{i}Z_{i}^{2} \geq x\right)\)</span>,
+where <span class="math inline">\(Z_{i}^{2}\)</span> is a random
+variable following <span class="math inline">\(\chi^{2}_{(1)}\)</span>
+distribution and <span class="math inline">\(x\)</span> represents the
+statistic (cvm or ad). The <code>CompQuadForm</code> package is being
+used for this purpose as it contains different methods for computing
+this tail probability. We were particularly interested in the
+<code>Farebrother</code> and <code>Imhof</code> methods. However, both
+the <code>Imhof</code> and <code>Farebrother</code> functions from the
+package encounter difficulties when computing the p-value if the
+statistic is in the very tail of the distribution or if some of the
+<span class="math inline">\(\lambda_{i}\)</span> values are very small.
+They may produce negative p-values or p-values that are not
+accurate.</p>
+<p>Through numerical experimentation in the GLM-Gamma case and
+comparison between p-values generated by <code>Imhof</code> and
+<code>Farebrother</code>, we discovered a way to solve this problem.
+After computing the eigenvalues, we remove values that are extremely
+small (e.g., <span class="math inline">\(1 \times 10^{-15}\)</span>).
+Then, we divide the remaining eigenvalues into two sets: one set
+contains values greater than <span class="math inline">\(\frac{\lambda_{1}}{2000}\)</span>, and the other
+set contains values less than <span class="math inline">\(\frac{\lambda_{1}}{2000}\)</span>. We then compute
+the sum of the eigenvalues in the second set and use this sum to
+compensate for the deleted eigenvalues, thereby correcting the cvm or ad
+statistic. The values of set one is used for p-value computation.</p>
+<p>During the computation of the p-value, we theoretically obtain both a
+lower bound (LB) and an upper bound (UB) for the p-value. If the LB is
+greater than 1e-7, we compute the p-value using the <code>Imhof</code>
+method and ensure that the computed p-value falls within the range
+between LB and UB. If it doesn’t, we calculate the p-value using the
+<code>Farebrother</code> method. If the LB falls between 1e-10 and 1e-7,
+we compute the p-value using the <code>Farebrother</code> method.
+Finally, if the LB is less than 1e-10, we first attempt to calculate the
+p-value using the <code>Farebrother</code> method. If this attempt
+fails, we return both the LB and UB along with a warning that
+<code>CompQuadForm</code> failed to generate a valid p-value.</p>
+</div>
+<div id="references" class="section level3">
+<h3>References</h3>
+<p>[1] Imhof, J.P. (1961). [Computing the Distribution of Quadratic
+Forms in Normal Variables] <em>Biometrika</em>, Vol. 48, 419-426.</p>
+<p>[2] Farebrother R.W. (1984). [Algorithm AS 204: The distribution of a
+Positive Linear Combination of chi-squared random variables] <em>Journal
+of the Royal Statistical Society</em>, Vol. 33, No. 3, 332-339.</p>
+<p>[3] Giner G. and Smyth G. K. (2016). [statmod: Probability
+calculations for the inverse Gaussian distribution] <em>R Journal</em>,
+Vol. 8, No 3, 339-351.</p>
+<p>[4] Stephens, M.A. (1974). [EDF Statistics for Goodness of Fit and
+Some Comparisons.] <em>Journal of the American Statistical
+Association</em>, Vol. 69, 730-737.</p>
+<p>[5] Stephens, M.A. (1976). [Asymptotic results for goodness-of-fit
+statistics with unknown parameters.] <em>Annals of Statistics</em>, Vol.
+4, 357-369.</p>
+<p>[6] Duchesne, P. and Lafaye De Micheaux, P. (2010). [Computing the
+distribution of quadratic forms: Further comparisons between the
+Liu-Tang-Zhang approximation and exact methods] <em>Computational
+Statistics and Data Analysis</em>, Vol. 54, 858-862.</p>
+</div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

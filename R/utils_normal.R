@@ -1,10 +1,12 @@
 #' Compute score function for Normal dist
 #'
-#' @param x a numeric vector of length n
+#' @param x a numeric vector of length n.
 #'
 #' @param theta a numeric vector of length two, containing MLE of parameters in Normal dist.
 #'
-#' @return Score matrix with n rows and two columns.
+#' @return Score matrix with n rows and two columns. First and second columns are partial derivatives of the log-likelihood w.r.t to mean and standard deviation, respectively.
+#'
+#' @noRd
 #'
 normalScore = function(x, theta){
 
@@ -27,11 +29,13 @@ normalScore = function(x, theta){
 }
 
 
-#' Compute MLE estimate for Normal
+#' Compute MLE estimates of mean and standard deviation in Normal distribution.
 #'
-#' @param x a numeric vector of length n
+#' @param x a numeric vector of length n.
 #'
-#' @return a numeric vector of length two, containing MLE of parameters in Normal dist.
+#' @return a numeric vector of length two. First element is mle of mean and second element mle of standard deviation.
+#'
+#' @noRd
 #'
 normalMLE = function(x){
 
@@ -51,13 +55,15 @@ normalMLE = function(x){
 }
 
 
-#' Compute probability inverse transform values for Normal distribution
+#' Compute probability integral transformed values for Normal distribution
 #'
 #' @param x a numeric vector of length n
 #'
 #' @param theta a numeric vector of length two, containing MLE of parameters in Normal dist.
 #'
-#' @return a vector of length n containing the probability inverse transformed (PIT) values
+#' @return a vector of length n containing the probability integral transformed (PIT) values
+#'
+#' @noRd
 #'
 normalPIT = function(x, theta){
 
@@ -82,15 +88,17 @@ normalPIT = function(x, theta){
 #'
 #' @return Fisher information matrix for Normal distribution
 #'
+#' @noRd
+#'
 normalFisherByHessian = function(theta){
 
-  # Extract the MLE of sd from theta vector
+  # Extract the MLE of standard deviation from theta vector
   sd.hat   <- theta[2]
 
   # Define a 2x2 matrix
   res      <- matrix(0, nrow = 2, ncol = 2)
 
-  # Compute values
+  # Compute entries of the matrix
   res[1,1] <- 1/(sd.hat^2)
   res[1,2] <- res[2,1] <- 0
   res[2,2] <- 2/(sd.hat^2)

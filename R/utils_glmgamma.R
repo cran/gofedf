@@ -1,17 +1,21 @@
 #' Compute score function for a generalized linear model with Gamma response.
 #'
-#' @param fit TBD
+#' @param fit An object returned from \code{\link{glm2}} function.
 #'
-#' @param theta a numeric vector of length (p+1), containing MLE of parameters in a linear model.
+#' @param theta a numeric vector of length (p+1), containing MLE of parameters
+#' in a linear model where p is the number of estimated parameters in the model.
 #'
 #' @return Score matrix with n rows and (p+2) columns.
+#'
+#' @noRd
 #'
 glmScorePIT = function(fit, theta){
 
   # MLE of shape parameter
   mle.alpha<- theta
 
-  # Extract family function, design matrix (x) from fit object, compute the linear predictor and extract response variable.
+  # Extract family function, design matrix (x) from fit object, compute the
+  # linear predictor and extract response variable.
   fm              <- family(fit)
   x               <- fit$x
   y               <- fit$y
@@ -53,6 +57,8 @@ glmScorePIT = function(fit, theta){
 #' documentation for the \code{\link{glm}} or \code{\link{glm2}} function.
 #'
 #' @return a numeric vector of estimates.
+#'
+#' @noRd
 #'
 glmMLE = function(fit){
 

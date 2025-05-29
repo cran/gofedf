@@ -1,6 +1,6 @@
 README
 ================
-2023-09-29
+2025-05-28
 
 # gofedf
 
@@ -8,15 +8,15 @@ README
 
 [![CRANstatus](https://www.r-pkg.org/badges/version/gofedf)](https://cran.r-project.org/package=gofedf)
 [![GitHubRelease](https://img.shields.io/github/release/pnickchi/gofedf?style=flat)](https://github.com/pnickchi/gofedf/releases)
-[![Github All
-Releases](https://img.shields.io/github/downloads/pnickchi/gofedf/total.svg?style=flat)](https://github.com/pnickchi/gofedf)
+[![Github
+AllReleases](https://cranlogs.r-pkg.org/badges/gofedf)](https://github.com/pnickchi/gofedf)
 <!-- badges: end -->
 
 Authors:
 
 - [Richard Lockhart](http://www.sfu.ca/~lockhart/), <lockhart@sfu.ca>
-- [Payman Nickchi](https://github.com/pnickchi), <pnickchi@sfu.ca>
-  (Maintainer)
+- [Payman Nickchi](https://github.com/pnickchi),
+  <payman.nickchi@gmail.com> (Maintainer)
 
 The `gofedf` package provides computational tools to apply
 goodness-of-fit tests based on empirical distribution function theory.
@@ -63,7 +63,7 @@ You can install the released version of `gofedf` from
 install.packages('gofedf')
 ```
 
-or the development version from [GitHub](https://github.com/pnickchi)
+or the latest version from [GitHub](https://github.com/pnickchi/gofedf)
 page with:
 
 ``` r
@@ -81,23 +81,48 @@ linear models. The final example showcases the most important feature of
 the package, allowing you to apply goodness-of-fit tests based on
 empirical distribution function EDF for a general likelihood model.
 
-### 1. Bivariate Normal distribution
+### 1. Normal distribution
 
 The first example illustrates the GOF test for an i.i.d. sample from a
 Normal distribution. The main function is `testNormal`. At the minimum,
-it requires a numeric vector as input. By default, it uses probability
-inverse-transformed values to compute the stochastic process and its
-covariance function later. You can change this behavior by setting
-`gridpit = FALSE` and assigning a positive value for `ngrid`. The
-default value for `ngrid` is the same as the number of observations,
-`n`. This means the (0,1) interval is divided into `n` equally spaced
-data points to compute the stochastic process and the covariance
-function. Additionally, the Fisher information matrix, by default, is
-estimated by the variance of the score function. To change this, you can
-set `hessian=TRUE` to estimate the Fisher information matrix using the
-Hessian instead. Finally, method is a string that defines the statistic
-to compute. Possible values are `cvm` for Cramer-von-Mises, `ad` for
-Anderson-Darling, and both to compute both.
+it requires a numeric vector as input and it runs by default values for
+arguments. Here we describe the parameters of this function. Note that
+some of them are the same and will show up later in other function. By
+default, the value of `discretize` is set to FALSE, meaning that an
+estimated integral equation is being solved to compute eigenvalues. If
+set to TRUE, the integral equation problem is replaced by a matrix
+equation problem and the eigenvalues of this matrix are computed
+instead.
+
+A common approach to solve for eigenvalues ($`\lambda`$) numerically is
+to discretize the integral over the interval \[0,1\]. For any given
+covariance function, such as $`\hat \rho(s,t)`$ in our case, the
+eigenvalues can be approximated by solving the following system of
+equations:
+
+``` math
+\sum_{j=1}^{m} w_{j} \rho(s_i,s_j)f(s_j) = \lambda_i f(s_i) \quad \quad i=1,2,3,\ldots,m
+```
+
+where $`m`$ is the number of knots $`s_j`$ being used to discretize the
+integral over \[0,1\] and $`w_j`$ are quadrature weights. The parameters
+`ngrid`, `gridpit`, and `hessian` which will follow are only relevant
+when you set `discretize = TRUE`.
+
+By default, the package uses probability integral transform values or
+PITs to compute the stochastic process and its covariance function
+later. You can change this behavior by setting `gridpit = FALSE` and
+assigning a positive value for `ngrid`. The default value for `ngrid` is
+the same as the number of observations, `n`. This means the (0,1)
+interval is divided into `n` equally spaced data points to compute the
+stochastic process and the covariance function (the values for $`s_i`$
+in the integral equation). Additionally, the Fisher information matrix,
+by default, is estimated by the variance of the score function. To
+change this, you can set `hessian=TRUE` to estimate the Fisher
+information matrix using the Hessian instead. Finally, method is a
+string that defines the statistic to compute. Possible values are `cvm`
+for Cramer-von-Mises, `ad` for Anderson-Darling, and both to compute
+both.
 
 ``` r
 # Reproducible example
@@ -112,35 +137,26 @@ testNormal(x = x, method = 'cvm')
 ```
 
     ## $Statistic
-    ## [1] 0.03781322
+    ## Cramer-von-Mises Statistic 
+    ##                 0.03781322 
     ## 
     ## $pvalue
-    ## [1] 0.6766974
-
-``` r
-# Test if the data follows a Normal distribution by calculating the Anderson-Darling statistic and approximate p-value of the test.
-testNormal(x = x, method = 'ad')
-```
-
-    ## $Statistic
-    ## [1] 0.2179704
-    ## 
-    ## $pvalue
-    ## [1] 0.9426823
+    ## [1] 0.7068748
 
 ``` r
 # Generate some random sample from a non Normal distribution.
-x <- rgamma(n, shape = 3)
+x <- rexp(n)
 testNormal(x = x, method = 'cvm')
 ```
 
     ## $Statistic
-    ## [1] 0.2141872
+    ## Cramer-von-Mises Statistic 
+    ##                  0.2368814 
     ## 
     ## $pvalue
-    ## [1] 0.004302717
+    ## [1] 0.005456979
 
-### 2. Bivariate Gamma distribution
+### 2. Gamma distribution
 
 The second example illustrates the GOF test for an i.i.d. sample from a
 Gamma distribution. The main function is `testGamma` and the arguments
@@ -152,31 +168,20 @@ set.seed(123)
 
 # Randomly generate some data
 n <- 50
-x <- rgamma(n, shape = 3)
+x <- rgamma(n, shape = 1)
 
 # Test if the data follows a Gamma distribution, calculate Cramer-von Mises statistic and approximate p-value
 testGamma(x = x, method = 'cvm')
 ```
 
     ## $Statistic
-    ## [1] 0.0549759
+    ## Cramer-von-Mises Statistic 
+    ##                 0.03313641 
     ## 
     ## $pvalue
-    ## [1] 0.3553938
+    ## [1] 0.7883045
 
-``` r
-# Generate some random sample from a distribution that is not Gamma
-x <- runif(n)
-testNormal(x = x, method = 'cvm')
-```
-
-    ## $Statistic
-    ## [1] 0.07085577
-    ## 
-    ## $pvalue
-    ## [1] 0.1730288
-
-### 3. Linear model with Normal error terms
+### 3. Linear Model with Normal Error Terms
 
 In this example, we illustrate how to apply GOF test to verify the
 assumptions of a linear model. The main function is `testLMNormal`. At
@@ -218,22 +223,25 @@ testLMNormal(x = X, y)
 ```
 
     ## $Statistic
-    ## [1] 0.02285164
+    ## Cramer-von-Mises Statistic 
+    ##                 0.02285164 
     ## 
     ## $pvalue
-    ## [1] 0.9089065
+    ## [1] 0.939902
 
 ``` r
-# Or alternatively just pass 'lm.fit' object directly instead:
+# Or alternatively just directly pass 'lm.fit' which is returned from lm() function. 
+# Note that in this case you need to set x = TRUE and y = TRUE.
 lm.fit <- lm(y ~ X, x = TRUE, y = TRUE)
 testLMNormal(fit = lm.fit)
 ```
 
     ## $Statistic
-    ## [1] 0.02285164
+    ## Cramer-von-Mises Statistic 
+    ##                 0.02285164 
     ## 
     ## $pvalue
-    ## [1] 0.9089065
+    ## [1] 0.939902
 
 ### 4. Gamma GLM with any link function
 
@@ -247,15 +255,16 @@ take an object of class `glm` and directly apply the goodness-of-fit
 test. You can use `glm` or `glm2` function from `glm2` pacakge. We
 recommend using the `glm2` function from the `glm2` package as it
 provides better estimates for the coefficients and avoids convergence
-issues in the optimization process. In either of these cases, there is
-no need to pass `x` and `y`. However, if you decide to use this feature,
-you must explicitly ask the `glm` or `glm2` function to return the
-design matrix and response variable by passing `x=TRUE` and `y=TRUE` (as
-shown in the example below). Additionally, you can pass a starting
-value, `start.value`, to be used as the initial value for MLE estimation
-of the coefficients. The function also offers a list of parameters to
-control the fitting process in `glm` or `glm2` functions. The other
-arguments of the function remain consistent with previous examples.
+issues in the optimization process while calculating MLE of
+coefficients. In either of these cases, there is no need to pass `x` and
+`y`. However, if you decide to use this feature (passing object from
+`glm` or `glm2` function), you must explicitly ask the `glm` or `glm2`
+function to return the design matrix by passing `x = TRUE` (as shown in
+the example below). Additionally, you can pass a starting value,
+`start.value`, to be used as the initial value for MLE estimation of the
+coefficients. The function also offers a list of parameters to control
+the fitting process in `glm` or `glm2` functions. The other arguments of
+the function remain consistent with previous examples.
 
 ``` r
 # Reproducible example
@@ -286,13 +295,11 @@ testGLMGamma(x=X, y, l = 'log', method = 'cvm')
 ```
 
     ## $Statistic
-    ## [1] 0.0870493
+    ## Cramer-von-Mises Statistic 
+    ##                  0.0870493 
     ## 
     ## $pvalue
-    ## [1] 0.1896532
-    ## 
-    ## $converged
-    ## [1] TRUE
+    ## [1] 0.1874801
 
 ``` r
 # Or alternatively just pass 'glm.fit' object directly instead:
@@ -301,13 +308,11 @@ testGLMGamma(fit = glm.fit, l = 'log')
 ```
 
     ## $Statistic
-    ## [1] 0.0870493
+    ## Cramer-von-Mises Statistic 
+    ##                  0.0870493 
     ## 
     ## $pvalue
-    ## [1] 0.1896532
-    ## 
-    ## $converged
-    ## [1] TRUE
+    ## [1] 0.1874801
 
 ### 5. General likelihood model
 
@@ -317,25 +322,25 @@ distribution functions for any general likelihood model. We provided
 tools to apply the test for Normal, Gamma, verify the assumptions in a
 linear model and generalized linear model. But this additional feature
 allows you to test if the sample come from any general likelihood model.
-For example, consider you have a sample of size $n$, such as
-$X_1, X_2, \ldots, X_n$, from a model with CDF of $F(X;\theta)$ where
-$\theta$ contains $p$ parameters. Before running the test, at the
-minimum you need the followings:
+For example, consider you have a sample of size $`n`$, such as
+$`X_1, X_2, \ldots, X_n`$, from a model with CDF of $`F(X;\theta)`$
+where $`\theta`$ contains $`p`$ parameters. Before running the test, at
+the minimum you need the followings:
 
 1)  A numeric vector of observations, `x`.
 
 2)  The probability inverse transformed or PIT values of the sample
     which ought to be a numeric vector with the same size as `x` and
-    with elements $F^{-1}(X_{i};\theta)$.
+    with elements $`F^{-1}(X_{i};\theta)`$.
 
-If $\theta$ is unknown, you also need to provide score function. This
-needs to be a matrix with $n$ rows and $p$ columns where each row
+If $`\theta`$ is unknown, you also need to provide score function. This
+needs to be a matrix with $`n`$ rows and $`p`$ columns where each row
 measures the score of each observation. Note that the values are
 computed as
-$S(X_{i};\theta) = \frac{\partial}{\partial \theta} \log(f(X_{i};\theta))$
-where $f(X_{i};\theta)$ is the probability density function. For sure,
-if $\theta$ is not known, this means you need to compute the MLE of
-$\theta$ to obtain item 1 and if needed the score function. The main
+$`S(X_{i};\theta) = \frac{\partial}{\partial \theta} \log(f(X_{i};\theta))`$
+where $`f(X_{i};\theta)`$ is the probability density function. For sure,
+if $`\theta`$ is not known, this means you need to compute the MLE of
+$`\theta`$ to obtain item 1 and if needed the score function. The main
 function to apply the GOF test in this case is `testYourModel`. The
 `precision` argument sets the precision needed to check if the col sums
 of score matrix are close enough to zero (log-likelihood is zero at
@@ -348,12 +353,12 @@ distribution, where the shape parameter depends on some weights. First,
 we generate data from an Inverse Gaussian distribution. For illustrative
 purposes, we include functions to compute the Maximum Likelihood
 Estimation (MLE) and score function for the sample. In the following
-chunck of code, `inversegaussianScore` is a function that returns the
-score for each observation, and `inversegaussianPIT` is a function that
-provides a vector of Probability Inverse Transformed (PIT) values.
-Additionally, `inversegaussianMLE` calculates the MLE of the mean and
-shape parameter. Second we calculate score, PIT and MLE of parameters.
-Finally we call `testYourModel` function to apply the test.
+chunck of code, `IGScore` is a function that returns the score for each
+observation, and `IGPIT` is a function that provides a vector of
+Probability Inverse Transformed (PIT) values. Additionally, `IGMLE`
+calculates the MLE of the mean and shape parameter. Second we calculate
+score, PIT and MLE of parameters. Finally we call `testYourModel`
+function to apply the test.
 
 ``` r
 # Example: Inverse Gaussian (IG) distribution with weights
@@ -376,12 +381,12 @@ lambda     <- 2
 y <- statmod::rinvgauss(n, mean = mio, shape = lambda * weights)
 
 # Compute MLE of parameters, score matrix, and pit values.
-theta_hat    <- inversegaussianMLE(obs = y,   w = weights)
-score.matrix <- inversegaussianScore(obs = y, w = weights, mle = theta_hat)
-pit.values   <- inversegaussianPIT(obs = y ,  w = weights, mle = theta_hat)
+theta_hat    <- IGMLE(obs = y,   w = weights)
+score.matrix <- IGScore(obs = y, w = weights, mle = theta_hat)
+pit.values   <- IGPIT(obs = y ,  w = weights, mle = theta_hat)
 
 # Apply the goodness-of-fit test.
-testYourModel(x = y, pit = pit.values, score = score.matrix)
+testYourModel(pit = pit.values, score = score.matrix)
 ```
 
     ## $Statistic
@@ -389,36 +394,36 @@ testYourModel(x = y, pit = pit.values, score = score.matrix)
     ##                 0.03292151 
     ## 
     ## $pvalue
-    ## [1] 0.8436222
+    ## [1] 0.8616661
 
 ### Note
 
 The calculation of the p-value for the goodness-of-fit test based on the
 empirical distribution function relies on computing the tail probability
 of a sum of chi-squared random variables. Specifically, after finding
-the eigenvalues $\lambda_{1}, \lambda_{2}, \ldots, \lambda_{n}$, we need
-to compute the p-value as follows:
-$p-value = Pr\left(\sum_{i=1}^{n} \lambda_{i}Z_{i}^{2} \geq x\right)$,
-where $Z_{i}^{2}$ is a random variable following $\chi^{2}_{(1)}$
-distribution and $x$ represents the statistic (cvm or ad). The
+the eigenvalues $`\lambda_{1}, \lambda_{2}, \ldots, \lambda_{n}`$, we
+need to compute the p-value as follows:
+$`p-value = Pr\left(\sum_{i=1}^{n} \lambda_{i}Z_{i}^{2} \geq x\right)`$,
+where $`Z_{i}^{2}`$ is a random variable following $`\chi^{2}_{(1)}`$
+distribution and $`x`$ represents the statistic (cvm or ad). The
 `CompQuadForm` package is being used for this purpose as it contains
 different methods for computing this tail probability. We were
 particularly interested in the `Farebrother` and `Imhof` methods.
 However, both the `Imhof` and `Farebrother` functions from the package
 encounter difficulties when computing the p-value if the statistic is in
-the very tail of the distribution or if some of the $\lambda_{i}$ values
-are very small. They may produce negative p-values or p-values that are
-not accurate.
+the very tail of the distribution or if some of the $`\lambda_{i}`$
+values are very small. They may produce negative p-values or p-values
+that are not accurate.
 
 Through numerical experimentation in the GLM-Gamma case and comparison
 between p-values generated by `Imhof` and `Farebrother`, we discovered a
 way to solve this problem. After computing the eigenvalues, we remove
-values that are extremely small (e.g., $1 \times 10^{-15}$). Then, we
+values that are extremely small (e.g., $`1 \times 10^{-15}`$). Then, we
 divide the remaining eigenvalues into two sets: one set contains values
-greater than $\frac{\lambda_{1}}{2000}$, and the other set contains
-values less than $\frac{\lambda_{1}}{2000}$. We then compute the sum of
-the eigenvalues in the second set and use this sum to compensate for the
-deleted eigenvalues, thereby correcting the cvm or ad statistic. The
+greater than $`\frac{\lambda_{1}}{2000}`$, and the other set contains
+values less than $`\frac{\lambda_{1}}{2000}`$. We then compute the sum
+of the eigenvalues in the second set and use this sum to compensate for
+the deleted eigenvalues, thereby correcting the cvm or ad statistic. The
 values of set one is used for p-value computation.
 
 During the computation of the p-value, we theoretically obtain both a

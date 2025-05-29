@@ -7,6 +7,8 @@
 #'
 #' @return a list with three elements.
 #'
+#' @noRd
+#'
 applyLMNormal = function(x, y){
 
   # Compute MLE of parameters
@@ -15,7 +17,7 @@ applyLMNormal = function(x, y){
   # Compute score function for sample
   Score <- lmScore(x, y, theta = par)
 
-  # Compute the probability inverse transfer (pit) values
+  # Compute the probability integral transformed (pit) values
   pit <- lmPIT(x = x, y = y, theta = par)
 
   # pit <- pnorm( (y - x %*% par$coef ) / sqrt(par$sigma2), mean = 0, sd = 1)

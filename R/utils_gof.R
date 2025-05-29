@@ -29,7 +29,8 @@ calculateWnuhat = function(S, FI, pit){
 }
 
 
-#' Calculate the estimate of W_{n}(u) process on a grid of equally spaced values over (0,1) interval
+#' Calculate the estimate of W_{n}(u) process on a grid of equally spaced values
+#' over (0,1) interval
 #'
 #' @param S score matrix with n rows and p columns.
 #' @param FI Fisher information matrix with p rows and p columns.
@@ -44,8 +45,9 @@ calculateWnuhat_manualGrid = function(S, FI, pit, M){
   # Find the number of observations
   n       <- nrow(S)
 
-  # Create a grid points over (0,1) interval. Note that we need to add a small number to the edges of interval.
-  # The covariance function does not define on the edges. We used 1e-5 for the epsilon.
+  # Create a grid points over (0,1) interval. Note that we need to add a small
+  # number to the edges of interval. The covariance function does not define on
+  # the edges. We used 1e-5 for the epsilon.
   epsilon <- 1e-5
   gridpts <- seq(0 + epsilon, 1 - epsilon, length = M)
 
@@ -70,7 +72,8 @@ calculateWnuhat_manualGrid = function(S, FI, pit, M){
 #' @param S score matrix with n rows and p columns.
 #' @param FI Fisher information matrix with p rows and p columns.
 #' @param pit a numeric vector of PIT values.
-#' @param me the goodness-of-fit statistic, Cramer-von-Mises or Anderson-Darling.
+#' @param me the goodness-of-fit statistic, Cramer-von-Mises or
+#'   Anderson-Darling.
 #'
 #' @return a numeric vector of Eigenvalues.
 #'
@@ -86,47 +89,50 @@ getEigenValues = function(S, FI, pit, me){
   # Compute the estimate of W_{n}(u) process over a grid of pit values.
   Mat     <- calculateWnuhat(S, FI, pit)
 
-  # Compute the covariance of the estimate of W_{n}(u) process and adjust for the sample size.
+  # Compute the covariance of the estimate of W_{n}(u) process and adjust for
+  # the sample size.
   W       <- var(Mat)
   #W       <- ( (n-1) * W ) / (n)
   W       <- ( (n-1) * W ) / (n-p-1)
 
 
-  # Compute b vector to adjust W matrix
-  pit <- sort(pit)
-  l   <- length(pit)
-  b   <- numeric()
-  for( j in 1:l ){
-
-    if( j == 1){
-      b[j] <- pit[2]
-    }
-
-    if( j == 2){
-      b[j] <- pit[3] - pit[1]
-    }
-
-    if( (j>2) & (j<=(n-1)) ){
-      b[j] <- pit[j+1] - pit[j-1]
-    }
-
-    if( j == n){
-      b[j] <- 1 - pit[n-1]
-    }
-
-  }
-  b   <- b / 2
-  b   <- b / sum(b)
-
-  # Create diagonal matrix with b vector elements
-  Q <- diag( sqrt(b) )
-
-  W <- Q %*% W %*% Q
-
-
-  # Compute the Eigenvalues of the covariance matrix depending on the goodness-of-fit statistic
+  # Compute the Eigenvalues of the covariance matrix depending on the
+  # goodness-of-fit statistic
   if( me == 'cvm' ){
-    #ev      <- eigen(W, symmetric = TRUE, only.values = TRUE)$values / length(pit)
+
+    # Compute b vector to adjust W matrix
+    pit <- sort(pit)
+    l   <- length(pit)
+    b   <- numeric()
+    for( j in 1:l ){
+
+      if( j == 1){
+        b[j] <- pit[2]
+      }
+
+      if( j == 2){
+        b[j] <- pit[3] - pit[1]
+      }
+
+      if( (j>2) & (j<=(n-1)) ){
+        b[j] <- pit[j+1] - pit[j-1]
+      }
+
+      if( j == n){
+        b[j] <- 1 - pit[n-1]
+      }
+
+    }
+    b   <- b / 2
+    b   <- b / sum(b)
+
+    # Create diagonal matrix with b vector elements
+    Q <- diag( sqrt(b) )
+
+    W <- Q %*% W %*% Q
+
+    #ev      <- eigen(W, symmetric = TRUE, only.values = TRUE)$values /
+    #length(pit)
     ev      <- eigen(W, symmetric = TRUE, only.values = TRUE)$values
     return(ev)
   }
@@ -134,8 +140,9 @@ getEigenValues = function(S, FI, pit, me){
   if( me == 'ad'){
     adj.value <- sqrt( outer( pit * (1- pit), pit * (1- pit) ) )
     W       <- W / adj.value
-    #ev      <- eigen(W, symmetric = TRUE, only.values = TRUE)$values / length(pit)
-    ev      <- eigen(W, symmetric = TRUE, only.values = TRUE)$values
+    ev      <- eigen(W, symmetric = TRUE, only.values = TRUE)$values / length(pit)
+
+    #ev      <- eigen(W, symmetric = TRUE, only.values = TRUE)$values
     return(ev)
   }
 
@@ -168,41 +175,9 @@ getEigenValues_manualGrid = function(S, FI, pit, M, me){
   W       <- var(Mat)
   W       <- ( (n-1) * W ) / (n-p-1)
 
-
-  # Compute b vector to adjust W matrix
-  pit <- sort(pit)
-  l   <- length(pit)
-  b   <- numeric()
-  for( j in 1:l ){
-
-    if( j == 1){
-      b[j] <- pit[2]
-    }
-
-    if( j == 2){
-      b[j] <- pit[3] - pit[1]
-    }
-
-    if( (j>2) & (j<=(n-1)) ){
-      b[j] <- pit[j+1] - pit[j-1]
-    }
-
-    if( j == n){
-      b[j] <- 1 - pit[n-1]
-    }
-
-  }
-  b   <- b / 2
-  b   <- b / sum(b)
-
-  # Create diagonal matrix with b vector elements
-  Q <- diag( sqrt(b) )
-
-  W <- Q %*% W %*% Q
-
   # Compute the Eigenvalues of the covariance matrix depending on the goodness-of-fit statistic
   if( me == 'cvm' ){
-    ev      <- eigen(W, symmetric = TRUE, only.values = TRUE)$values
+    ev      <- eigen(W, symmetric = TRUE, only.values = TRUE)$values / M
     return(ev)
   }
 
@@ -211,7 +186,7 @@ getEigenValues_manualGrid = function(S, FI, pit, M, me){
     s <- s / (M + 1)
     adj.value <- sqrt( outer( s*(1-s) , s*(1-s) ) )
     W <- W / adj.value
-    ev      <- eigen(W, symmetric = TRUE, only.values = TRUE)$values
+    ev      <- eigen(W, symmetric = TRUE, only.values = TRUE)$values / M
     return(ev)
   }
 
@@ -225,6 +200,7 @@ getEigenValues_manualGrid = function(S, FI, pit, M, me){
 #' @return a numeric value, CvM statistics
 #'
 #' @noRd
+#'
 getCvMStatistic = function(x){
 
   n   <- length(x)
@@ -244,6 +220,7 @@ getCvMStatistic = function(x){
 #' @return a numeric value, AD statistics
 #'
 #' @noRd
+#'
 getADStatistic = function(x){
 
   n   <- length(x)
@@ -268,6 +245,7 @@ getADStatistic = function(x){
 #' @return p-value
 #'
 #' @noRd
+#'
 getpvalue = function(u, eigen){
 
   # set_1 is from i=1 to J1
@@ -293,6 +271,7 @@ getpvalue = function(u, eigen){
     if( (pvalue < LB) & (pvalue > UB) ){
        # Imhof method failed to produce a valid pvalue. Compute p-value by farebrother method instead
        pvalue <- CompQuadForm::farebrother(q = u - sum(set_2), lambda = set_1)$Qq
+       return(pvalue)
     }
   }
 
@@ -300,6 +279,7 @@ getpvalue = function(u, eigen){
   if( (1e-10 <= LB) & (LB < 1e-7) ){
     # Compute p-value by farebrother method
     pvalue <- CompQuadForm::farebrother(q = u - sum(set_2), lambda = set_1)$Qq
+    return(pvalue)
   }
 
 
@@ -418,4 +398,80 @@ integrandForLowerBound = function(t, ST, EV){
   b   <- ST / EV[1]
   res <- pchisq(q = (b-t)/a, df = 1, lower.tail = FALSE) * dchisq(x = t, df = 1)
   return(res)
+}
+
+
+
+#' Compute P matrix
+#'
+#' @param n sample size
+#'
+#' @param S Score, a matrix with n rows (sample size) and p columns (number of parameters).
+#'
+#' @param method a character string indicating which goodness-of-fit statistic is to be computed.
+#'
+#' @return a matrix with n rows and n columns.
+#'
+#' @noRd
+computeMatrix = function(n, S, method){
+
+  if(method == 'cvm'){
+
+    # Define the identity matrix
+    I <- diag( rep(1,n) )
+
+    # Add a columns of one to score matrix
+    S <- cbind(rep(1,n),S)
+
+    # Define the Hat matrix resulted from regressing columns of score on columns of indicator function.
+    H <- S %*% solve( t(S) %*% S ) %*% t(S)
+
+    # Define a vector of values, 1 to n.
+    u <- (1:n)
+
+    # Define an nxn matrix Q with elements q_{ij} = (-1/n) max(u_{i},u_{j})
+    Q <- (-1/n) * outer(u, u, FUN = pmax)
+
+    # Define P matrix as P = (I - H) Q (I - H)
+    P <- (I - H) %*% Q %*% (I - H)
+
+  }
+
+  if(method == 'ad'){
+
+    # Define the identity matrix
+    I <- diag( rep(1,n) )
+
+    # Add a columns of one to score matrix
+    S <- cbind(rep(1,n),S)
+
+    # Define the Hat matrix resulted from regressing columns of score on columns of indicator function.
+    H <- S %*% solve( t(S) %*% S ) %*% t(S)
+
+    # Define a vector of values, 1 to n.
+    u <- (1:n)/(n+1)
+
+    # Compute the maxumum of vector u and compute the require log transformed
+    umax <- max(u)
+    constant <- log( umax/(1-umax) )
+
+    # Define Q matrix with elements of Q_ij = constant - log( max(u_i,u_j) / ( 1 - max(u_i,u_j) ) )
+    Q <- constant - outer(u, u, FUN = utility_function)
+
+    # Define P matrix as P = (I - H) Q (I - H)
+    P <- (I - H) %*% Q %*% (I - H)
+
+  }
+
+
+  # Return matrix P
+  return(P)
+
+}
+
+
+utility_function = function(x,y){
+
+  log( pmax(x,y) / (1 - pmax(x,y)) )
+
 }

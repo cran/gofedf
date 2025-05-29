@@ -2,13 +2,17 @@
 % Please edit documentation in R/testGLMGamma.R
 \name{testGLMGamma}
 \alias{testGLMGamma}
-\title{Apply Goodness of Fit Test to the Residuals of a Generalized Linear Model with Gamma Link Function}
+\title{Apply Goodness of Fit Test to the Residuals of a Generalized Linear Model with
+Gamma Link Function}
 \usage{
 testGLMGamma(
   x,
   y,
   fit = NULL,
   l = "log",
+  discretize = FALSE,
+  ngrid = length(y),
+  gridpit = TRUE,
   hessian = FALSE,
   start.value = NULL,
   control = NULL,
@@ -16,50 +20,79 @@ testGLMGamma(
 )
 }
 \arguments{
-\item{x}{is either a numeric vector or a design matrix. In the design matrix, rows indicate observations and columns
-presents covariats.}
+\item{x}{is either a numeric vector or a design matrix. In the design matrix,
+rows indicate observations and columns presents covariats.}
 
-\item{y}{is a vector of numeric values with the same number of observations or number of rows as x.}
+\item{y}{is a vector of numeric values with the same number of observations or
+number of rows as x.}
 
-\item{fit}{is an object of class \code{glm} and its default value is NULL. If a fit of class \code{glm} is provided,
-the arguments \code{x}, \code{y}, and \code{l} will be ignored. We recommend using \code{\link{glm2}} function from
-\code{\link{glm2}} package since it provides better convergence while optimizing the likelihood to estimate
-coefficients of the model by IWLS method. It is required to return design matrix by \code{x} = \code{TRUE} in
-\code{\link{glm}} or \code{\link{glm2}} function. For more information on how to do this, refer to the help
-documentation for the \code{\link{glm}} or \code{\link{glm2}} function.}
+\item{fit}{is an object of class \code{glm} and its default value is NULL. If
+a fit of class \code{glm} is provided, the arguments \code{x}, \code{y}, and
+\code{l} will be ignored. We recommend using \code{\link[glm2]{glm2}} function
+from \code{\link[glm2]{glm2}} package since it provides better convergence while
+optimizing the likelihood to estimate coefficients of the model by IWLS
+method. It is required to return design matrix by \code{x} = \code{TRUE} in
+\code{\link{glm}} or \code{\link[glm2]{glm2}} function. For more information on
+how to do this, refer to the help documentation for the \code{\link{glm}} or
+\code{\link[glm2]{glm2}} function.}
 
-\item{l}{a character vector indicating the link function that should be used for Gamma family. Some common
-link functions for Gamma family are 'log' and 'inverse'. For more details see \code{\link{make.link}} from stats
-package in R.}
+\item{l}{a character vector indicating the link function that should be used
+for Gamma family. Acceptable link functions for Gamma family are inverse,
+identity and log. For more details see \code{\link{Gamma}} from stats
+package.}
 
-\item{hessian}{logical. If \code{TRUE} the Fisher information matrix is estimated by the observed Hessian Matrix based on
-the sample. If \code{FALSE} (the default value) the Fisher information matrix is estimated by the variance of the
-observed score matrix.}
+\item{discretize}{If \code{TRUE}, the covariance function of \eqn{W_{n}(u)}
+process is evaluated at some data points (see \code{ngrid} and
+\code{gridpit}), and the integral equation is replaced by a matrix equation.
+If \code{FALSE} (the default value), the covariance function is first
+estimated, and then the integral equation is solved to find the eigenvalues.
+The results of our simulations recommend using the estimated covariance for
+solving the integral equation. The parameters \code{ngrid}, \code{gridpit},
+and \code{hessian} are only relevant when \code{discretize = TRUE}.}
 
-\item{start.value}{a numeric value or vector. This is the same as \code{start} argument in \code{\link{glm}} or
-\code{\link{glm2}}. The value is a starting point in iteratively reweighted least squares (IRLS) algorithm for
+\item{ngrid}{the number of equally spaced points to discretize the (0,1)
+interval for computing the covariance function.}
+
+\item{gridpit}{logical. If \code{TRUE} (the default value), the parameter
+ngrid is ignored and (0,1) interval is divided based on probability
+integral transforms or PITs obtained from the sample. If \code{FALSE}, the
+interval is divided into ngrid equally spaced points for computing the
+covariance function.}
+
+\item{hessian}{logical. If \code{TRUE} the Fisher information matrix is
+estimated by the observed Hessian Matrix based on the sample. If
+\code{FALSE} (the default value) the Fisher information matrix is estimated
+by the variance of the observed score matrix.}
+
+\item{start.value}{a numeric value or vector. This is the same as \code{start}
+argument in \code{\link{glm}} or \code{\link[glm2]{glm2}}. The value is a starting
+point in iteratively reweighted least squares (IRLS) algorithm for
 estimating the MLE of coefficients in the model.}
 
-\item{control}{a list of parameters to control the fitting process in \code{glm} or \code{glm2} function.
-For more details, see \code{\link{glm.control}}.}
+\item{control}{a list of parameters to control the fitting process in
+\code{glm} or \code{glm2} function. For more details, see
+\code{\link{glm.control}}.}
 
-\item{method}{a character string indicating which goodness-of-fit statistic is to be computed. The default value is
-'cvm' for the Cramer-von-Mises statistic. Other options include 'ad' for the Anderson-Darling statistic, and 'both'
-to compute both cvm and ad.}
+\item{method}{a character string indicating which goodness-of-fit statistic is
+to be computed. The default value is 'cvm' for the Cramer-von-Mises
+statistic. Other options include 'ad' for the Anderson-Darling statistic,
+and 'both' to compute both cvm and ad.}
 }
 \value{
-A list of three containing the following components:
+A list of two containing the following components:
 \itemize{
 \item Statistic: the value of goodness-of-fit statistic.
-\item p-value: the approximate p-value for the goodness-of-fit test based on empirical distribution function.
-if method = 'cvm' or method = 'ad', it returns a numeric value for the statistic and p-value. If method = 'both', it
-returns a numeric vector with two elements and one for each statistic.
+\item p-value: the approximate p-value for the goodness-of-fit test.
+if method = 'cvm' or method = 'ad', it returns a numeric value for the
+statistic and p-value. If method = 'both', it returns a numeric vector with
+two elements and one for each statistic.
 \item converged: logical to indicate if the IWLS algorithm have converged or not.
 }
 }
 \description{
-\code{testGLMGamma} is used to check the validity of Gamma assumption for the response variable when
-fitting generalized linear model. Common link functions in \code{\link{glm}} can be used here.
+\code{testGLMGamma} is used to check the validity of Gamma assumption for the
+response variable when fitting generalized linear model. Common link functions
+in \code{\link{glm}} can be used here.
 }
 \examples{
 set.seed(123)

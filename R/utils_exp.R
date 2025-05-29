@@ -6,6 +6,8 @@
 #'
 #' @return Score matrix with n rows and two columns.
 #'
+#' @noRd
+#'
 expScore = function(x, theta){
 
   # Compute score
@@ -24,7 +26,9 @@ expScore = function(x, theta){
 #'
 #' @param x a numeric vector of length n
 #'
-#' @return Numeric
+#' @return numeric value for the MLE of rate
+#'
+#' @noRd
 #'
 expMLE = function(x){
   theta <- 1 / mean(x)
@@ -40,6 +44,8 @@ expMLE = function(x){
 #' @param theta a numeric vector of length one, containing MLE rate in Exponential dist.
 #'
 #' @return a vector of length n containing the probability inverse transformed (PIT) values
+#'
+#' @noRd
 #'
 expPIT = function(x, theta){
 

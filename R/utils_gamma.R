@@ -4,7 +4,9 @@
 #'
 #' @param theta a numeric vector of length two, containing MLE of parameters in Gamma dist.
 #'
-#' @return Score matrix with n rows and two columns.
+#' @return Score matrix with n rows and two columns. First and second columns are partial derivatives of the log-likelihood w.r.t to shape and sclae, respectively.
+#'
+#' @noRd
 #'
 gammaScore = function(x, theta){
 
@@ -34,6 +36,8 @@ gammaScore = function(x, theta){
 #' @param ur logical. If \code{TRUE} the rate parameter is returned. Otherwise the scale is returned.
 #'
 #' @return a vector of length two with shape and scale/rate.
+#'
+#' @noRd
 #'
 gammaMLE = function(x, ur){
 
@@ -78,13 +82,15 @@ gammaMLE = function(x, ur){
 }
 
 
-#' Compute probability inverse transform values for Gamma distribution
+#' Compute probability integral transformed values for Gamma distribution
 #'
 #' @param x a numeric vector of length n
 #'
 #' @param theta a numeric vector of length two, containing MLE of parameters in Gamma dist.
 #'
-#' @return a vector of length n containing the probability inverse transformed (PIT) values
+#' @return a vector of length n containing the probability integral transformed(PIT) values
+#'
+#' @noRd
 #'
 gammaPIT = function(x, theta){
 
@@ -104,6 +110,8 @@ gammaPIT = function(x, theta){
 #' @param theta a numeric vector of length two, containing MLE of parameters in Gamma dist
 #'
 #' @return Fisher information matrix for Gamma distribution
+#'
+#' @noRd
 #'
 gammaFisherByHessian = function(theta){
 

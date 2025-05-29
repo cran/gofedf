@@ -28,10 +28,6 @@ x <- rnorm(n)
 testNormal(x = x, method = 'cvm')
 
 ## -----------------------------------------------------------------------------
-# Test if the data follows a Normal distribution by calculating the Anderson-Darling statistic and approximate p-value of the test.
-testNormal(x = x, method = 'ad')
-
-## -----------------------------------------------------------------------------
 # Generate some random sample from a non Normal distribution.
 x <- rgamma(n, shape = 3)
 testNormal(x = x, method = 'cvm')
@@ -42,15 +38,10 @@ set.seed(123)
 
 # Randomly generate some data
 n <- 50
-x <- rgamma(n, shape = 3)
+x <- rgamma(n, shape = 1)
 
 # Test if the data follows a Gamma distribution, calculate Cramer-von Mises statistic and approximate p-value
 testGamma(x = x, method = 'cvm')
-
-## -----------------------------------------------------------------------------
-# Generate some random sample from a distribution that is not Gamma
-x <- runif(n)
-testNormal(x = x, method = 'cvm')
 
 ## -----------------------------------------------------------------------------
 # Reproducible example
@@ -137,10 +128,10 @@ lambda     <- 2
 y <- statmod::rinvgauss(n, mean = mio, shape = lambda * weights)
 
 # Compute MLE of parameters, score matrix, and pit values.
-theta_hat    <- inversegaussianMLE(obs = y,   w = weights)
-score.matrix <- inversegaussianScore(obs = y, w = weights, mle = theta_hat)
-pit.values   <- inversegaussianPIT(obs = y ,  w = weights, mle = theta_hat)
+theta_hat    <- IGMLE(obs = y,   w = weights)
+score.matrix <- IGScore(obs = y, w = weights, mle = theta_hat)
+pit.values   <- IGPIT(obs = y ,  w = weights, mle = theta_hat)
 
 # Apply the goodness-of-fit test.
-testYourModel(x = y, pit = pit.values, score = score.matrix)
+testYourModel(pit = pit.values, score = score.matrix)
 
